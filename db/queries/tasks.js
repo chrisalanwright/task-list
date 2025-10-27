@@ -11,3 +11,46 @@ export async function createTask(title, done, userId) {
   const { rows } = await db.query(sql, [title, done, userId]);
   return rows[0];
 }
+
+export async function getTasksByUserId(userId) {
+  const sql = `
+        SELECT *
+        FROM tasks
+        WHERE user_id = $1
+    `;
+  const { rows } = await db.query(sql, [userId]);
+  return rows;
+}
+
+export async function getTaskById(id) {
+  const sql = `
+        SELECT *
+        FROM tasks
+        WHERE id = $1
+  `;
+  const {
+    rows: [task],
+  } = await db.query(sql, [id]);
+  return task;
+}
+
+export async function updateTask(id, title, done) {
+  const sql = `
+        UPDATE tasks
+        SET title = $2, done = $3
+        WHERE id = $1
+        RETURNING *
+  `;
+  const {
+    rows: [task],
+  } = await db.query(sql, [id, title, done]);
+  return task;
+}
+
+export async function deleteTask(id) {
+  const sql = `
+        DELETE FROM tasks
+        WHERE id = $1
+  `;
+  await db.query(sql, [id]);
+}
